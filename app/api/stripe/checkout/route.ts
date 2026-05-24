@@ -16,6 +16,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Plano inválido' }, { status: 400 })
     }
 
+    if (!stripe) {
+      return NextResponse.json({ error: 'Stripe não configurado' }, { status: 500 })
+    }
+
     // Busca ou cria customer no Stripe
     const { data: nutritionist } = await supabase
       .from('nutritionists')

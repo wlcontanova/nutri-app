@@ -3,20 +3,21 @@ import { createClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe'
 
 export async function POST(req: Request) {
+  if (!stripe) {
+    return NextResponse.json({ error: 'Stripe não configurado' }, { status: 500 })
+  }
+
   const body = await req.text()
   const signature = req.headers.get('stripe-signature')
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 
-  if (!signature) {
-    return NextResponse.json({ error: 'Sem assinatura' }, { status: 400 })
+  if (!signature || !webhookSecret) {
+    return NextResponse.json({ error: 'Configuração inválida' }, { status: 400 })
   }
 
   let event
   try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    )
+    event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
   } catch {
     return NextResponse.json({ error: 'Assinatura inválida' }, { status: 400 })
   }
