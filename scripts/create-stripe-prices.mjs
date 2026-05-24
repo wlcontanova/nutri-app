@@ -1,5 +1,5 @@
 import Stripe from 'stripe'
-const stripe = new Stripe('SUA_CHAVE_SECRETA_DO_STRIPE')
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 async function main() {
   // Criar produto Nutri Pro
